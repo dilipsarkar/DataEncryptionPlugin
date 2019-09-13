@@ -1,6 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="cordova-plugin-dataencryption" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>DataEncryption</name>
+	<author>Dilip Sarkar</author>
+	<license>BSD</license>
+	<repo>https://github.com/dilipsarkar/DataEncryptionPlugin</repo>
+    <issue>https://github.com/dilipsarkar/DataEncryptionPlugin/issues</issue>
 	<js-module name="DataEncryption" src="www/DataEncryption.js">
 		<clobbers target="DataEncryption" />
 	</js-module>
