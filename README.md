@@ -13,10 +13,10 @@ cordova plugin add cordova-plugin-dataencryption --save
 - Android
 
 # How does it work?
- - **Set key** - We decide a key(strong enough) using which we will encrypt our data. We would need the same key to decrypt encrypted data. Key can be persisted on the app side, its stored on native storage. If we want to make it more secure then we can also use a passcode which will be used in combination with the key to encrypt the data.
- - **Get Key** - If we persisted key using setKey API, we have to call getKey API to get the key to be able to decrypt encrypted data.
- - **Encryption** - We call encrypt API, along with raw data, key and passcode(optional) to encrypt raw data.
- - **Decryption** - We call decrypt API, along with encrypted data, key and passcode(optional) to decrypt encrypted data.
+ - **Set key** - Define a key(strong enough) which will be used to encrypt your data. Same key is needed to decrypt your encrypted data. Key can be persisted on the app side using setKey API, its stored on native storage. If you want to make it more secure then you can also use a passcode which will be used in combination with the key to encrypt your data.
+ - **Get Key** - If your key was persisted using setKey API, getKey API will return your key using which you would be able to decrypt encrypted data.
+ - **Encryption** - Call encrypt API, along with raw data, key and passcode(optional) to encrypt your raw data.
+ - **Decryption** - Call decrypt API, along with encrypted data, key and passcode(optional) to decrypt your encrypted data.
 
 # Usage
 On ```deviceReady``` event(or there after) we have to perform all our actions 

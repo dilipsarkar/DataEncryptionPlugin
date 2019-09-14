@@ -14,5 +14,12 @@
     "cordova encryption"
   ],
   "author": "Dilip Sarkar",
-  "license": "BSD"
+  "license": "BSD",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/dilipsarkar/DataEncryptionPlugin.git"
+  }
 }
