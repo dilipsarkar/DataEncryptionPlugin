@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-dataencryption" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="cordova-plugin-dataencryption" version="0.0.2" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>DataEncryption</name>
 	<author>Dilip Sarkar(dilipsarkar.info@gmail.com)</author>
 	<license>BSD</license>
@@ -24,4 +24,27 @@
 		<source-file src="src/android/libs/arm64-v8a/libconceal.so" target-dir="libs/arm64-v8a" />
         <source-file src="src/android/libs/x86_64/libconceal.so" target-dir="libs/x86_64" />
 	</platform>
+
+	<platform name="ios"> 
+        <config-file target="config.xml" parent="/*">
+            <feature name="DataEncryption">
+                <param name="ios-package" value="DataEncryption" /> 
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/DataEncryption.h" target-dir="src/ios/" />
+        <source-file src="src/ios/DataEncryption.m" target-dir="src/ios/" />
+        
+        <header-file src="src/ios/Cipher.h" target-dir="src/ios/" />
+        <source-file src="src/ios/Cipher.m" target-dir="src/ios/" />
+
+		<header-file src="src/ios/NSData+Base64.h" target-dir="src/ios/" />
+		<source-file src="src/ios/NSData+Base64.m" target-dir="src/ios/" />
+
+		<header-file src="src/ios/NSString+Base64.h" target-dir="src/ios/" />
+		<source-file src="src/ios/NSString+Base64.m" target-dir="src/ios/" />
+
+		<header-file src="src/ios/NSData+CommonCrypto.h" target-dir="src/ios/" />
+        <source-file src="src/ios/NSData+CommonCrypto.m" target-dir="src/ios/" />
+    </platform>
 </plugin>

@@ -1,11 +1,12 @@
 {
   "name": "cordova-plugin-dataencryption",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Use this plugin to encrypt and decrypt data sensitive data. Its useful when we want to persist some sensitive data e.g. access token, on application",
   "cordova": {
     "id": "cordova-plugin-dataencryption",
     "platforms": [
-      "android"
+      "android",
+      "ios"
     ]
   },
   "keywords": [

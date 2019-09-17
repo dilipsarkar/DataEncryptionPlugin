@@ -1,21 +1,22 @@
-//package cordova-plugin-dataencryption;
-
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaInterface;
 import android.util.Log;
-import android.provider.Settings;
-import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import com.facebook.crypto.*;
-import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
 import com.facebook.crypto.util.SystemNativeCryptoLibrary;
 import android.util.Base64;
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.facebook.android.crypto.keychain.AndroidConceal;
+import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain;
+import com.facebook.crypto.Crypto;
+import com.facebook.crypto.CryptoConfig;
+import com.facebook.crypto.Entity;
+//import com.facebook.crypto.exception.CryptoInitializationException;
+import com.facebook.crypto.exception.KeyChainException;
+import com.facebook.crypto.keychain.KeyChain;
 
 public class DataEncryption extends CordovaPlugin {
 	public static final String TAG = "DataEncryption Plugin";
@@ -38,18 +39,25 @@ public class DataEncryption extends CordovaPlugin {
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
 		this.context = cordova.getActivity().getApplicationContext();
-		// Defines the Crypto class
-		crypto = new Crypto(new SharedPrefsBackedKeyChain(cordova.getActivity().getApplicationContext()), new SystemNativeCryptoLibrary());
+		KeyChain keyChain = new SharedPrefsBackedKeyChain(this.context, CryptoConfig.KEY_256);
+		crypto = AndroidConceal.get().createDefaultCrypto(keyChain);
+
+		// Check for whether the crypto functionality is available
+		// This might fail if Android does not load libaries correctly.
+		if (crypto.isAvailable()) {
+			crypto = new Crypto(new SharedPrefsBackedKeyChain(cordova.getActivity().getApplicationContext()), new SystemNativeCryptoLibrary());
+		}
+		
 	}
 
 	public boolean execute(final String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		//checks for the input is whether Encryption or Decryption and calls the method accordingly
 		if (action.equalsIgnoreCase("encryption")) {
-			// Execute the encryptData() Method and returns the encrypted data back to CryptoPlugin.js
+			// Execute the encryptData() Method and returns the encrypted data back to DataEncryption.js
 			callbackContext.success(this.encryptData(args.getString(0), args.getString(1), args.getString(2)));
 			return true;
 		} else if (action.equalsIgnoreCase("decryption")) {
-			// Execute the decryptData() Method and returns the decrypted data back to CryptoPlugin.js
+			// Execute the decryptData() Method and returns the decrypted data back to DataEncryption.js
 			callbackContext.success(this.decryptData(args.getString(0), args.getString(1), args.getString(2)));
 			return true;
 		} else if (action.equalsIgnoreCase("setKey")) {
@@ -73,24 +81,27 @@ public class DataEncryption extends CordovaPlugin {
 			Log.v(TAG,"encryptData keyName : "+ keyName);
 		}
 
-		try {
-			String encKey = getKey(keyName) + passcode;
-			byte[] data = plainText.getBytes("UTF-8");
-			encText = crypto.encrypt(data, new Entity(encKey));		// Encrypting the plain text
-			encTextStr = Base64.encodeToString(encText, Base64.DEFAULT);	// Converting the encrypted data to string
-			if (DEBUG) {
-				Log.v(TAG," Encypted data : "+ encTextStr);
-			}
-		} catch (Exception e) {
-			if (DEBUG) {
-				Log.v(TAG," Exception encypted data : "+ e.toString());
+		if (crypto.isAvailable()) {
+			try {
+				String encKey = getKey(keyName) + passcode;
+				Entity mEntityPassword = Entity.create(encKey);
+				byte[] data = plainText.getBytes("UTF-8");
+				encText = crypto.encrypt(data, mEntityPassword);	// Encrypting the plain text
+				encTextStr = Base64.encodeToString(encText, Base64.DEFAULT);	// Converting the encrypted data to string
+				if (DEBUG) {
+					Log.v(TAG," Encypted data : "+ encTextStr);
+				}
+			} catch (Exception e) {
+				if (DEBUG) {
+					Log.v(TAG," Exception encypted data : "+ e.toString());
+				}
 			}
 		}
 		return encTextStr; 
 	}
 
 	// Decryption process starts here
-	public String decryptData(String keyName, String encText, String passcode) { 
+	public String decryptData(String keyName, String encText, String passcode) {
 		byte[] plainText = null;
 		String plainTxtStr = "";
 
@@ -98,19 +109,21 @@ public class DataEncryption extends CordovaPlugin {
 			Log.v(TAG," decryptData keyName : "+ keyName);
 		}
 
-		try {
-			//TODO: Check for error from getKey()
-			String encKey = getKey(keyName) + passcode;
-			byte[] data = Base64.decode(encText, Base64.DEFAULT);
-			plainText = crypto.decrypt(data, new Entity(encKey));	// Decrypting the plain text
-			plainTxtStr = new String(plainText, "UTF-8");	// Converting the Decrypted data to string
+		if (crypto.isAvailable()) {
+			try {
+				String encKey = getKey(keyName) + passcode;
+				Entity mEntityPassword = Entity.create(encKey);
+				byte[] data = Base64.decode(encText, Base64.DEFAULT);
+				plainText = crypto.decrypt(data, mEntityPassword);	// Decrypting the plain text
+				plainTxtStr = new String(plainText, "UTF-8");	// Converting the Decrypted data to string
 
-			if (DEBUG) {
-				Log.v(TAG," Decypted data :: "+ plainTxtStr);
-			}
-		} catch (Exception e) {
-			if (DEBUG) {
-				Log.v(TAG,e.toString()+"decryptData Exception");
+				if (DEBUG) {
+					Log.v(TAG," Decypted data :: "+ plainTxtStr);
+				}
+			} catch (Exception e) {
+				if (DEBUG) {
+					Log.v(TAG,e.toString()+"decryptData Exception");
+				}
 			}
 		}
 		return plainTxtStr;

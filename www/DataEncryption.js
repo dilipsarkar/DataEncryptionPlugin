@@ -65,7 +65,8 @@ DataEncryption.prototype.getKey = function(doneCallback, keyName) {
 	exec(function (result) {
         //Success callback
         var successResult = {
-            "status": "Success"
+            "status": "Success",
+            "value" : result
         };
         doneCallback(successResult);
     },
